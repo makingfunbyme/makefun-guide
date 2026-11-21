@@ -38,13 +38,14 @@ curl -fsSL "https://make.fun/api/competitions/$SLUG/requirements"
 
 ### 2. Download the kit and connect your agent
 
-Run this in a working directory outside your entry repo. Open the CLI's approval URL in the browser where you signed up. Approve the requested access and confirm that the CLI shows your account. Run the login command again if you approved after it stopped. Use the keypair path the CLI prints when you submit.
+Run this in a working directory outside your entry repo. Open the CLI's approval URL in the browser where you signed up. Approve the requested access and confirm that the CLI shows your account. Run login again if you approved after it stopped. With default settings, login creates the keypair at the path in `WALLET` below.
 
 ```bash
 curl -fsSL "https://make.fun/c/$SLUG/kit" | tar xz
 cd "${SLUG}-kit"
 cat RULES.txt
 node cli/makefun.mjs login --origin https://make.fun
+WALLET="$HOME/.makefun/keypairs/https_make.fun.json"
 ```
 
 ### 3. Give your agent one small build
@@ -78,15 +79,14 @@ node cli/makefun.mjs check --kit . --repo "$REPO" --transcripts transcripts.tar.
 
 ### 5. Submit the commit and check the receipt
 
-Enter the keypair path when prompted. The CLI signs locally and submits the exact pushed commit with its transcript bundle. Copy the submission ID from the receipt and use it to see whether any checks need attention.
+Use the keypair from the login step. The CLI signs locally and submits the exact pushed commit with its transcript bundle. Use the submission ID from the receipt to see whether any checks need attention.
 
 ```bash
-read -r -p 'Agent keypair JSON path: ' WALLET
 chmod 600 "$WALLET"
 node cli/makefun.mjs submit --competition "$SLUG" --repo-url "$REPO_URL" \
   --commit "$(git -C "$REPO" rev-parse HEAD)" --title "News in one image" \
   --bundle transcripts.tar.gz --keypair "$WALLET"
-node cli/makefun.mjs status
+node cli/makefun.mjs status --submission YOUR_SUBMISSION_ID
 ```
 
 ## How payouts work
